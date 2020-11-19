@@ -1,0 +1,83 @@
+require "pry"
+class TicTacToe
+    attr_accessor :board
+    def initialize
+        @board = [" ", " ", " ", " ", " ", " ", " ", " ", " "] #Array.new(9, " ")
+    end
+    WIN_COMBINATIONS = [
+        [0, 1, 2], 
+        [3, 4, 5], 
+        [6, 7, 8], 
+        [0, 3, 6],
+        [1, 4, 7], 
+        [2, 5, 8], 
+        [0, 4, 8], 
+        [2, 4, 6]
+    ]
+    def display_board
+        puts " #{board[0]} | #{board[1]} | #{board[2]} "
+        puts "-----------"
+        puts " #{board[3]} | #{board[4]} | #{board[5]} "
+        puts "-----------"
+        puts " #{board[6]} | #{board[7]} | #{board[8]} "
+    end
+    def input_to_index(string)
+       # binding.pry
+         string.to_i-1
+    end
+    def move(index, token)
+        board[index] = token
+    end
+    def position_taken?(position)
+        board[position] != " "
+
+    end
+    def valid_move?(index)
+        !position_taken?(index) && index.between?(0, 8)
+           
+    end
+    def turn_count
+        count = 0
+        board.each {|square| square != " " ? count +=1 : nil}
+        count
+        #board.count {|square| square != " "}
+        #(board - [" "]).length #does not use iterators
+    end
+    def current_player
+        turn_count.odd? ? "O" : "X"
+    end
+    def turn
+        user_input = gets.strip
+        user_index = input_to_index(user_input)
+        valid_move?(user_index) ? move(user_index, current_player) : turn
+        display_board
+
+    end
+    def won?
+        WIN_COMBINATIONS.each do |win_combo|
+            if board[win_combo[0]] == board[win_combo[1]] && board[win_combo[1]] == board[win_combo[2]] && position_taken?(win_combo[0])
+                return win_combo
+            end
+        end
+        return false
+    end
+    def full?
+        turn_count == 9
+    #    board.all?{|space| space != " "}
+    end
+    def draw?
+        !won? && full?
+    end
+    def over?
+        draw? || won?
+    end
+    def winner
+        if winning_combo = won?
+            board[winning_combo[1]]
+        end
+    end
+    def play
+        turn until over?
+        puts won? ? "Congratulations #{winner}!" : "Cat's Game!"
+    end
+end
